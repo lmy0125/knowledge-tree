@@ -9,25 +9,20 @@ const openai = new OpenAI({
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-	const { messages } = await req.json();
-	console.log(messages);
+	// Extract the `prompt` from the body of the request
+	const { prompt } = await req.json();
 
-	// Ask OpenAI for a streaming chat completion given the prompt
-	const response = await openai.chat.completions.create({
-		model: 'gpt-3.5-turbo-16k',
+	// Ask OpenAI for a streaming completion given the prompt
+	const response = await openai.completions.create({
+		model: 'gpt-3.5-turbo-instruct',
+		max_tokens: 2000,
 		stream: true,
-		messages: [
-			{
-				role: 'system',
-				content:
-					'You will be provided with statements, and your task is to convert them to standard English.',
-			},
-      ...messages,
-		],
+		prompt,
 	});
 
 	// Convert the response into a friendly text-stream
 	const stream = OpenAIStream(response);
+
 	// Respond with the stream
 	return new StreamingTextResponse(stream);
 }

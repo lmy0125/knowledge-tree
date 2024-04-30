@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
    * https://js.langchain.com/docs/modules/model_io/models/
    */
   const model = new ChatOpenAI({
+    streaming: true,
     temperature: 0.8,
   });
 
