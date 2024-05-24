@@ -13,8 +13,8 @@ const Accordion = ({ title, content, children }: { title: string; content: strin
 
 			{isOpen && (
 				<div className="pl-8">
-					<p className="my-2">{content}</p>
-					<div className="my-2">{children}</div>
+					<p className="mb-2">{content}</p>
+					<div className="mb-2">{children}</div>
 				</div>
 			)}
 		</div>

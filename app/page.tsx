@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useActions, useUIState } from 'ai/rsc';
 import { nanoid } from 'nanoid';
 import { ClientMessage } from './actions';
@@ -11,17 +11,10 @@ export default function Home() {
 	const { continueConversation } = useActions();
 
 	return (
-		<div className="mx-auto w-full max-w-md py-24 flex flex-col stretch">
-			<div>
-				{conversation.map((message: ClientMessage, index: number) => (
-					<div key={index}>
-						{message.role}: {message.display}
-					</div>
-				))}
-			</div>
-
-			<div className="fixed w-full max-w-md bottom-0 border border-gray-300 rounded mb-8 shadow-xl p-2">
-				<input
+		<div className="relative mx-auto py-32 w-full max-w-md flex flex-col">
+			<div className="fixed w-full max-w-md top-0 border border-gray-300 rounded mt-10 shadow-xl p-2 flex justify-around bg-white">
+				<textarea
+					className="w-1/2"
 					value={input}
 					onChange={(event) => {
 						setInput(event.target.value);
@@ -29,18 +22,27 @@ export default function Home() {
 				/>
 				<button
 					onClick={async () => {
-						setInput('');
-						setConversation((currentConversation: ClientMessage[]) => [
-							...currentConversation,
-							{ id: nanoid(), role: 'user', display: input },
-						]);
+						if (input !== '') {
+							setInput('');
+							// setConversation((currentConversation: ClientMessage[]) => [
+							// 	...currentConversation,
+							// 	{ id: nanoid(), role: 'user', display: input },
+							// ]);
+							const message = await continueConversation(input);
 
-						const message = await continueConversation(input);
-
-						setConversation((currentConversation: ClientMessage[]) => [...currentConversation, message]);
+							setConversation((currentConversation: ClientMessage[]) => [...currentConversation, message]);
+						}
 					}}>
-					Send Message
+					Generate
 				</button>
+			</div>
+
+			<div>
+				{conversation.map((message: ClientMessage, index: number) => (
+					<div key={index}>
+						{message.role}: {message.display}
+					</div>
+				))}
 			</div>
 		</div>
 	);
