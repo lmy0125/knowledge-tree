@@ -1,43 +1,85 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useActions, useUIState } from 'ai/rsc';
 import { nanoid } from 'nanoid';
 import { ClientMessage } from './actions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Home() {
 	const [input, setInput] = useState<string>('');
 	const [conversation, setConversation] = useUIState();
 	const { continueConversation } = useActions();
 
-	return (
-		<div className="relative mx-auto py-32 w-full max-w-md flex flex-col">
-			<div className="fixed w-full max-w-md top-0 border border-gray-300 rounded mt-10 shadow-xl p-2 flex justify-around bg-white">
-				<textarea
-					className="w-1/2"
-					value={input}
-					onChange={(event) => {
-						setInput(event.target.value);
-					}}
-				/>
-				<button
-					onClick={async () => {
-						if (input !== '') {
-							setInput('');
-							// setConversation((currentConversation: ClientMessage[]) => [
-							// 	...currentConversation,
-							// 	{ id: nanoid(), role: 'user', display: input },
-							// ]);
-							const message = await continueConversation(input);
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0]; // Get the first file from the input
+		if (file && file.type === 'text/plain') {
+			// Check if it's a text file
+			const reader = new FileReader();
 
-							setConversation((currentConversation: ClientMessage[]) => [...currentConversation, message]);
-						}
-					}}>
-					Generate
-				</button>
+			reader.onload = (e) => {
+				setInput(e.target?.result as string); // Set the read content into state
+				console.log(e.target?.result);
+			};
+
+			reader.onerror = (e) => {
+				console.error('Failed to read file!', e);
+			};
+
+			reader.readAsText(file); // Read the file content as text
+		} else {
+			event.preventDefault();
+			alert('Please upload a txt file.');
+		}
+	};
+
+	return (
+		<div className="flex flex-col min-h-screen">
+			<div className="sticky top-0 z-10 w-full flex justify-center bg-white border-b-4">
+				<div className="border border-gray-300 rounded shadow-xl p-2 flex justify-center bg-white space-x-5">
+					<Tabs defaultValue="text" className="w-[400px]">
+						<TabsList className="grid w-full grid-cols-2">
+							<TabsTrigger value="text">Text</TabsTrigger>
+							<TabsTrigger value="file">File Upload</TabsTrigger>
+						</TabsList>
+						<TabsContent value="file">
+							<Label htmlFor="transcript">Transcript</Label>
+							<Input id="transcript" type="file" onChange={(e) => handleFileChange(e)} />
+						</TabsContent>
+						<TabsContent value="text">
+							<Label htmlFor="transcript">Transcript</Label>
+							<Textarea
+								value={input}
+								placeholder="Paste your transcript here."
+								onChange={(event) => {
+									setInput(event.target.value);
+								}}
+							/>
+						</TabsContent>
+					</Tabs>
+					<Button
+						onClick={async () => {
+							if (input !== '') {
+								setInput('');
+								// setConversation((currentConversation: ClientMessage[]) => [
+								// 	...currentConversation,
+								// 	{ id: nanoid(), role: 'user', display: input },
+								// ]);
+								const message = await continueConversation(input);
+
+								setConversation((currentConversation: ClientMessage[]) => [...currentConversation, message]);
+							}
+						}}>
+						Generate
+					</Button>
+				</div>
 			</div>
 
-			<div>
+			<div className="flex-1 p-4 px-48">
 				{conversation.map((message: ClientMessage, index: number) => (
 					<div key={index}>
 						{message.role}: {message.display}

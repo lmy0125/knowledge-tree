@@ -81,7 +81,6 @@ export async function continueConversation(input: string): Promise<ClientMessage
 					// 		content: '',
 					// 	},
 					// ]);
-					console.log(lectureNoteSchema);
 					return lectureNoteSchema.keyPoints.map((keyPoint: KeyPoint, index: number) => (
 						<Accordion key={index} title={keyPoint.title} content={keyPoint.content}>
 							{keyPoint.children && keyPoint.children.length > 0
