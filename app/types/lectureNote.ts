@@ -2,9 +2,10 @@ import { z } from 'zod';
 
 export const KeyPoint: z.ZodSchema = z.lazy(() =>
 	z.object({
-		title: z.string().optional().describe('The title of the key point'),
-		content: z.string().optional().describe('The content of the key point'),
-		children: z.array(KeyPoint).optional().describe('The sub key points of the key point'),
+		id: z.string().describe('uuid'),
+		title: z.string().describe('The title of the key point'),
+		content: z.string().describe('The content of the key point'),
+		children: z.array(KeyPoint).describe('The sub key points of the key point'),
 	})
 );
 

@@ -1,9 +1,9 @@
 import { useActions, readStreamableValue } from 'ai/rsc';
-
 import { LectureNote, KeyPoint } from '@/types/lectureNote';
 import { useEffect, useRef, useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { KeyPointsProvider, useKeyPointsContext } from '@/contexts/KeyPointsContext';
 
 export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote }) => {
 	return (
@@ -21,7 +21,7 @@ export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote
 				<h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Key Points</h2>
 				<Accordion type="multiple" className="w-full">
 					{lectureNote.children?.map((keyPoint: KeyPoint, index: number) => (
-						<AccordionItem value={keyPoint?.title + index}>
+						<AccordionItem value={keyPoint?.title + index} key={keyPoint?.title + index}>
 							<KeyPointComponent key={index} keyPoint={keyPoint} />
 						</AccordionItem>
 					))}
@@ -33,7 +33,7 @@ export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote
 
 const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 	const { generateMore } = useActions();
-	const [newKeyPoint, setNewKeyPoint] = useState<KeyPoint | null>(null);
+	const { keyPoints, insertNode } = useKeyPointsContext();
 	const [children, setChildren] = useState<KeyPoint[]>([]);
 	const [buttonPosition, setButtonPosition] = useState({ visible: false, x: 0, y: 0 });
 	const textRef = useRef<HTMLParagraphElement>(null);
@@ -57,19 +57,20 @@ const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 		if (selection.toString() && rects.length > 0 && textRef.current?.contains(range.commonAncestorContainer)) {
 			// Calculate position for the tooltip button
 			const firstRect = rects[0];
-			// console.log(selection, range, firstRect.left, firstRect.top, textRef.current);
 
 			setButtonPosition({
 				visible: true,
 				x: firstRect.left + window.scrollX, // Align button to start of the text selection
 				y: firstRect.top + window.scrollY - 40, // 40px above the selection
 			});
+		} else {
+			setButtonPosition((prev) => ({ ...prev, visible: false }));
 		}
 	};
 
 	const handleAddChild = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		event.stopPropagation();
-		console.log('ASDASDAWD');
+		setButtonPosition((prev) => ({ ...prev, visible: false }));
 		const text = window.getSelection()?.toString();
 		console.log('clicked', text);
 		window.getSelection()?.removeAllRanges(); // Remove selection after action
@@ -78,19 +79,9 @@ const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 
 			for await (const partialObject of readStreamableValue<any>(object)) {
 				if (partialObject) {
-					setNewKeyPoint(partialObject.KeyPoint as KeyPoint);
-					console.log('object', partialObject);
 					setChildren([...children, partialObject.KeyPoint as KeyPoint]);
 				}
 			}
-			// if (keyPoint.children) {
-			// 	console.log('newKeyPoint', newKeyPoint);
-			// 	keyPoint.children.push(newKeyPoint);
-			// } else {
-			// 	console.log('newKeyPoint', newKeyPoint);
-			// 	keyPoint.children = [newKeyPoint];
-			// }
-			setButtonPosition((prev) => ({ ...prev, visible: false }));
 		}
 	};
 
@@ -128,7 +119,7 @@ const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 					{children && children.length > 0 && (
 						<>
 							{children?.map((child: KeyPoint, index: number) => (
-								<AccordionItem value={keyPoint?.title + index}>
+								<AccordionItem value={keyPoint?.title + index} key={keyPoint?.title + index}>
 									<KeyPointComponent key={index} keyPoint={child} />
 								</AccordionItem>
 							))}
