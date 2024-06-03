@@ -1,5 +1,5 @@
 'use client';
-
+export const dynamic = 'force-dynamic';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useActions, useUIState } from 'ai/rsc';
 import { nanoid } from 'nanoid';
@@ -15,18 +15,19 @@ import Accordion from './components/Accordion';
 import { LectureNoteComponent } from '@/components/LectureNote';
 import { LectureNote, KeyPoint } from '@/types/lectureNote';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { unstable_noStore as noStore } from 'next/cache';
 
 interface StreamedObject {
 	lectureNote: LectureNote;
 }
 
 export default function Home() {
+	noStore();
 	const [input, setInput] = useState<string>('');
 	const [conversation, setConversation] = useUIState();
 	const [lectureNote, setLectureNote] = useState();
 	const [openInput, setOpenInput] = useState<boolean>(true);
-	const { customUI, generateLectureNote } = useActions();
-	const [generation, setGeneration] = useState<string>('');
+	const { generateLectureNote } = useActions();
 	console.log(lectureNote);
 
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -81,31 +82,16 @@ export default function Home() {
 						</Tabs>
 						<Button
 							onClick={async () => {
-								if (input !== '') {
-									setInput('');
-									// setConversation((currentConversation: ClientMessage[]) => [
-									// 	...currentConversation,
-									// 	{ id: nanoid(), role: 'user', display: input },
-									// ]);
-									const message = await customUI(input);
-									setConversation((currentConversation: ClientMessage[]) => [...currentConversation, message]);
-								}
-							}}>
-							Generate
-						</Button>
-						<Button
-							onClick={async () => {
 								setOpenInput(false);
 								const { object } = await generateLectureNote(input);
 
 								for await (const partialObject of readStreamableValue<StreamedObject>(object)) {
 									if (partialObject) {
 										setLectureNote(partialObject.lectureNote as any);
-										setGeneration(JSON.stringify(partialObject.lectureNote, null, 2));
 									}
 								}
 							}}>
-							Ask
+							Generate Note
 						</Button>
 					</div>
 				</CollapsibleContent>

@@ -17,9 +17,3 @@ export const LectureNote = z.object({
 export type LectureNote = z.infer<typeof LectureNote>;
 
 export type KeyPoint = z.infer<typeof KeyPoint>;
-
-// export interface KeyPoint {
-// 	title?: string;
-// 	content?: string;
-// 	children?: KeyPoint[];
-// }
