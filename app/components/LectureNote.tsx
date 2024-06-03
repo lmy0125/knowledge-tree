@@ -19,7 +19,7 @@ export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote
 
 			<section className="mb-4">
 				<h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Key Points</h2>
-				<Accordion type="multiple" collapsible className="w-full">
+				<Accordion type="multiple" className="w-full">
 					{lectureNote.children?.map((keyPoint: KeyPoint, index: number) => (
 						<AccordionItem value={keyPoint?.title + index}>
 							<KeyPointComponent key={index} keyPoint={keyPoint} />
@@ -74,7 +74,7 @@ const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 		console.log('clicked', text);
 		window.getSelection()?.removeAllRanges(); // Remove selection after action
 		if (text) {
-			const { object } = await generateMore(`Explain ${text} in this context: ${keyPoint.content}`);
+			const { object } = await generateMore(`Explain: ${text}. Context: ${keyPoint.content}`);
 
 			for await (const partialObject of readStreamableValue<any>(object)) {
 				if (partialObject) {
@@ -124,7 +124,7 @@ const KeyPointComponent = ({ keyPoint }: { keyPoint: KeyPoint }) => {
 						Know More
 					</Button>
 				)}
-				<Accordion type="multiple" collapsible className="w-full">
+				<Accordion type="multiple" className="w-full">
 					{children && children.length > 0 && (
 						<>
 							{children?.map((child: KeyPoint, index: number) => (
