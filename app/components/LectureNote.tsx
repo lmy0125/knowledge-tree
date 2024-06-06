@@ -7,7 +7,7 @@ import { KeyPointsProvider, useKeyPointsContext } from '@/contexts/KeyPointsCont
 
 export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote }) => {
 	return (
-		<div>
+		<>
 			<section className="mb-4">
 				<h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Summary</h2>
 				<p>{lectureNote.summary}</p>
@@ -27,7 +27,7 @@ export const LectureNoteComponent = ({ lectureNote }: { lectureNote: LectureNote
 					))}
 				</Accordion>
 			</section>
-		</div>
+		</>
 	);
 };
 
