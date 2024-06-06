@@ -15,7 +15,7 @@ import { LectureNote, KeyPoint } from '@/types/lectureNote';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { unstable_noStore as noStore } from 'next/cache';
 import { KeyPointsProvider, useKeyPointsContext } from '@/contexts/KeyPointsContext';
-
+import { FlowChart } from '@/components/FlowChart';
 interface StreamedObject {
 	lectureNote: LectureNote;
 }
@@ -23,8 +23,7 @@ interface StreamedObject {
 export default function Home() {
 	noStore();
 	const [input, setInput] = useState<string>('');
-	const [conversation, setConversation] = useUIState();
-	const [lectureNote, setLectureNote] = useState();
+	const [lectureNote, setLectureNote] = useState<LectureNote>();
 	const [openInput, setOpenInput] = useState<boolean>(true);
 	const { generateLectureNote } = useActions();
 
@@ -55,7 +54,7 @@ export default function Home() {
 			<div className="flex flex-col min-h-screen">
 				<Collapsible open={openInput} onOpenChange={setOpenInput}>
 					<CollapsibleTrigger>
-						<div className="flex justify-end w-screen px-10">{openInput ? <ChevronUp /> : <ChevronDown />}</div>
+						<div className="flex justify-end w-full px-10">{openInput ? <ChevronUp /> : <ChevronDown />}</div>
 					</CollapsibleTrigger>
 					<CollapsibleContent className="sticky top-0 z-10 w-full flex justify-center bg-white border-b-4">
 						<div className="border border-gray-300 rounded shadow-xl p-2 flex justify-center bg-white space-x-5">
@@ -86,7 +85,7 @@ export default function Home() {
 
 									for await (const partialObject of readStreamableValue<StreamedObject>(object)) {
 										if (partialObject) {
-											setLectureNote(partialObject.lectureNote as any);
+											setLectureNote(partialObject.lectureNote);
 										}
 									}
 								}}>
@@ -96,14 +95,26 @@ export default function Home() {
 					</CollapsibleContent>
 				</Collapsible>
 
-				<div className="flex-1 p-4 px-48">
-					{conversation.map((message: ClientMessage, index: number) => (
-						<div key={index}>
-							{message.role}: {message.display}
-						</div>
-					))}
-					{lectureNote && <LectureNoteComponent lectureNote={lectureNote} />}
-				</div>
+				{lectureNote && (
+					<div className="flex justify-center">
+						<Tabs defaultValue="graph">
+							<TabsList className="grid grid-cols-2 w-[400px]">
+								<TabsTrigger value="graph">Graph View</TabsTrigger>
+								<TabsTrigger value="markdown">Markdown View</TabsTrigger>
+							</TabsList>
+							<TabsContent value="markdown">
+								<div style={{ width: '95vw' }} className="px-48 max-w">
+									<LectureNoteComponent lectureNote={lectureNote} />
+								</div>
+							</TabsContent>
+							<TabsContent value="graph">
+								<div style={{ width: '95vw', height: '85vh' }}>
+									<FlowChart lectureNote={lectureNote} />
+								</div>
+							</TabsContent>
+						</Tabs>
+					</div>
+				)}
 			</div>
 		</KeyPointsProvider>
 	);
