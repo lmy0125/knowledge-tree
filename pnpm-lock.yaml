@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/openai':
         specifier: ^0.0.9
         version: 0.0.9(zod@3.23.7)
+      '@dagrejs/dagre':
+        specifier: ^1.1.2
+        version: 1.1.2
       '@radix-ui/react-accordion':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.2.4)(@types/react@18.2.8)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
@@ -162,6 +165,13 @@ packages:
   '@babel/types@7.24.5':
     resolution: {integrity: sha512-6mQNsaLeXTw0nxYUYu+NSa4Hx4BlF1x1x8/PMFbiR+GBSr+2DkECc69b8hgy2frEodNcvPffeH8YfWd3LI6jhQ==}
     engines: {node: '>=6.9.0'}
+
+  '@dagrejs/dagre@1.1.2':
+    resolution: {integrity: sha512-F09dphqvHsbe/6C2t2unbmpr5q41BNPEfJCdn8Z7aEBpVSy/zFQ/b4SWsweQjWNsYMDvE2ffNUN8X0CeFsEGNw==}
+
+  '@dagrejs/graphlib@2.2.2':
+    resolution: {integrity: sha512-CbyGpCDKsiTg/wuk79S7Muoj8mghDGAESWGxcSyhHX5jD35vYMBZochYVFzlHxynpE9unpu6O+4ZuhrLxASsOg==}
+    engines: {node: '>17.0.0'}
 
   '@eslint/eslintrc@0.4.3':
     resolution: {integrity: sha512-J6KFFz5QCYUJq3pf0mjEcCJVERbzv71PUIDczuh9JkwGEzced6CO5ADLHB1rbf/+oPBtoPfMYNOpGDzCANlbXw==}
@@ -2925,6 +2935,12 @@ snapshots:
       '@babel/helper-string-parser': 7.24.1
       '@babel/helper-validator-identifier': 7.24.5
       to-fast-properties: 2.0.0
+
+  '@dagrejs/dagre@1.1.2':
+    dependencies:
+      '@dagrejs/graphlib': 2.2.2
+
+  '@dagrejs/graphlib@2.2.2': {}
 
   '@eslint/eslintrc@0.4.3':
     dependencies:

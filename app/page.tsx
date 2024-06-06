@@ -16,6 +16,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { unstable_noStore as noStore } from 'next/cache';
 import { KeyPointsProvider, useKeyPointsContext } from '@/contexts/KeyPointsContext';
 import { FlowChart } from '@/components/FlowChart';
+import { ReactFlowProvider } from 'reactflow';
 interface StreamedObject {
 	lectureNote: LectureNote;
 }
@@ -109,7 +110,9 @@ export default function Home() {
 							</TabsContent>
 							<TabsContent value="graph">
 								<div style={{ width: '95vw', height: '85vh' }}>
-									<FlowChart lectureNote={lectureNote} />
+									<ReactFlowProvider>
+										<FlowChart lectureNote={lectureNote} />
+									</ReactFlowProvider>
 								</div>
 							</TabsContent>
 						</Tabs>

@@ -10,16 +10,46 @@ import ReactFlow, {
 	Background,
 	BackgroundVariant,
 	Node,
+	useReactFlow,
+	Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import Dagre from '@dagrejs/dagre';
+import { Button } from '@/components/ui/button';
 import { SummaryNode, KeyPointNode } from '@/components/CustomNodes';
 import { KeyPoint, LectureNote } from '@/types/lectureNote';
 
-// Helper function to calculate positions
-function calculatePosition(index: number, total: number, startY: number): number {
-	const gap = 100; // Vertical gap between nodes
-	return startY + (index - (total - 1) / 2) * gap;
-}
+const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+
+const getLayoutedElements = (nodes: Node[], edges: Edge[], options: { direction: string }) => {
+	g.setGraph({ rankdir: options.direction });
+
+	edges.forEach((edge) => g.setEdge(edge.source, edge.target));
+	nodes.forEach((node) => {
+		const { width, height, ...rest } = node;
+		const typedNode = {
+			...rest,
+			width: width ?? 0, // Set width to 0 if it's null or undefined
+			height: height ?? 0, // Set height to 0 if it's null or undefined
+		};
+		g.setNode(node.id, typedNode);
+	});
+
+	Dagre.layout(g);
+
+	return {
+		nodes: nodes.map((node) => {
+			const position = g.node(node.id);
+			// We are shifting the dagre node position (anchor=center center) to the top left
+			// so it matches the React Flow node anchor point (top left).
+			const x = node.width ? position.x - node.width / 2 : position.x;
+			const y = node.height ? position.y - node.height / 2 : position.y;
+
+			return { ...node, position: { x, y } };
+		}),
+		edges,
+	};
+};
 
 // Function to generate nodes and edges
 function generateGraph(
@@ -91,13 +121,20 @@ function generateGraph(
 
 export const FlowChart = ({ lectureNote }: { lectureNote: LectureNote }) => {
 	const { nodes: initialNodes, edges: initialEdges } = generateGraph(lectureNote);
-	console.log(initialNodes, initialEdges);
-
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
+	console.log(initialNodes, initialEdges);
+
+	const onLayout = useCallback(
+		(direction: string) => {
+			const layouted = getLayoutedElements(nodes, edges, { direction });
+			setNodes([...layouted.nodes]);
+			setEdges([...layouted.edges]);
+		},
+		[nodes, edges]
+	);
 
 	const nodeTypes = useMemo(() => ({ summary: SummaryNode, keyPoint: KeyPointNode }), []);
-
 	const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
 	useEffect(() => {
@@ -114,8 +151,13 @@ export const FlowChart = ({ lectureNote }: { lectureNote: LectureNote }) => {
 			onConnect={onConnect}
 			nodeTypes={nodeTypes}
 			fitView>
+			<Panel position="top-right">
+				<Button variant="outline" onClick={() => onLayout('TB')}>
+					Format
+				</Button>
+			</Panel>
 			<Controls />
-			<MiniMap />
+			<MiniMap zoomable pannable />
 			<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 		</ReactFlow>
 	);
