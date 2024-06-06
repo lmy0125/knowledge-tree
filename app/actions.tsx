@@ -31,13 +31,23 @@ export async function generateLectureNote(input: string) {
 		const { partialObjectStream } = await streamObject({
 			model: openai('gpt-3.5-turbo'),
 			system:
-				'You are a professional note taker. You are tasked with generating a knowledge tree base on a lecture transcript. You need to create detailed notes by reorganizing what the speaker says as if you are a high achieving student word by word. Generate as much content as possible. For the root node, summarize the whole lecture and any logistics that were mentioned. Then create sub nodes on the key points in the lecture, and each of them should have children of sub key points, which builds a tree structure of content.',
+				'You are a professional note taker. You are tasked with generating a knowledge tree base on a lecture transcript. You need to create detailed notes by repeating what the speaker says as if you are a high achieving student word by word. Generate as much content as possible. For the root node, summarize the whole lecture and any logistics that were mentioned. Then create sub nodes on the key points in the lecture, and each of them should have children of sub key points, which builds a tree structure of content.',
 			prompt: input,
 			schema: z.object({
 				lectureNote: z.object({
 					summary: z.string().describe('The summary of the lecture'),
-					logistic: z.string().describe('The logistic of the lecture, including homework, exam, etc.'),
-					children: z.array(KeyPoint).min(1).describe('The key points of the lecture'),
+					logistic: z.string().describe('The logistic of the lecture, such as homework, exam, etc.'),
+					children: z
+						.array(
+							z.object({
+								id: z.string().describe('uuid'),
+								title: z.string().describe('The title of the key point'),
+								content: z.string().describe('The content of the key point'),
+								children: z.array(KeyPoint).min(2).describe('The sub key points of the key point'),
+							})
+						)
+						.min(3)
+						.describe('The key points of the lecture'),
 				}),
 			}),
 			maxTokens: 4096,

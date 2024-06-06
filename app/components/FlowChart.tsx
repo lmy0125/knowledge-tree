@@ -120,6 +120,7 @@ function generateGraph(
 }
 
 export const FlowChart = ({ lectureNote }: { lectureNote: LectureNote }) => {
+	const { fitView } = useReactFlow();
 	const { nodes: initialNodes, edges: initialEdges } = generateGraph(lectureNote);
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(initialEdges);
@@ -130,6 +131,9 @@ export const FlowChart = ({ lectureNote }: { lectureNote: LectureNote }) => {
 			const layouted = getLayoutedElements(nodes, edges, { direction });
 			setNodes([...layouted.nodes]);
 			setEdges([...layouted.edges]);
+			window.requestAnimationFrame(() => {
+				fitView({ minZoom: 0.1 });
+			});
 		},
 		[nodes, edges]
 	);
@@ -140,6 +144,9 @@ export const FlowChart = ({ lectureNote }: { lectureNote: LectureNote }) => {
 	useEffect(() => {
 		setNodes(initialNodes);
 		setEdges(initialEdges);
+		window.requestAnimationFrame(() => {
+			fitView();
+		});
 	}, [lectureNote]);
 
 	return (
