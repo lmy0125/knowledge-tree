@@ -65,14 +65,14 @@ export default function Home() {
 									<TabsTrigger value="file">File Upload</TabsTrigger>
 								</TabsList>
 								<TabsContent value="file">
-									<Label htmlFor="transcript">Transcript</Label>
+									<Label htmlFor="transcript">Text File</Label>
 									<Input id="transcript" type="file" onChange={(e) => handleFileChange(e)} />
 								</TabsContent>
 								<TabsContent value="text">
-									<Label htmlFor="transcript">Transcript</Label>
+									<Label htmlFor="transcript">Input</Label>
 									<Textarea
 										value={input}
-										placeholder="Paste your transcript here."
+										placeholder="Type your question here..."
 										onChange={(event) => {
 											setInput(event.target.value);
 										}}
@@ -90,7 +90,7 @@ export default function Home() {
 										}
 									}
 								}}>
-								Generate Note
+								Generate
 							</Button>
 						</div>
 					</CollapsibleContent>
