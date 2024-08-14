@@ -30,12 +30,16 @@ export async function generateLectureNote(input: string) {
 	(async () => {
 		const { partialObjectStream } = await streamObject({
 			model: openai('gpt-3.5-turbo'),
-			system:
-				'You are a professional note taker. You are tasked with generating a knowledge tree base on a lecture transcript. You need to create detailed, comprehensive, in-depth notes by repeating what the speaker says as if you are teaching a high achieving student step-bt-step. Generate as much content as possible. For the root node, summarize the whole lecture and any logistics that were mentioned. Then create sub nodes on the key points in the lecture, and each of them should have children of sub key points, which builds a tree structure of content.',
+			system: `You are a professional professor that are good at explaining terminologies and concepts.
+			You are asked to break up a conecept into smaller parts and explain it in detail.
+			You are tasked with generating a knowledge tree base on a specific topic.
+			You need to create detailed, comprehensive, in-depth notes as if you are teaching a high achieving student step-bt-step.
+			 Generate as much content as possible. For the root node, summarize the whole lecture and any logistics that were mentioned. Then create sub nodes on the key points in the lecture,
+			  and each of them should have children of sub key points, which builds a tree structure of content.`,
 			prompt: input,
 			schema: z.object({
 				lectureNote: z.object({
-					summary: z.string().describe('The summary of the lecture'),
+					summary: z.string().describe('The general explanation of the topic'),
 					logistic: z.string().describe('The logistic of the lecture, such as homework, exam, etc.'),
 					children: z
 						.array(
@@ -47,7 +51,7 @@ export async function generateLectureNote(input: string) {
 							})
 						)
 						.min(3)
-						.describe('The key points of the lecture'),
+						.describe('The key points of the topic'),
 				}),
 			}),
 			maxTokens: 4096,
