@@ -5,8 +5,8 @@ import { AI } from './actions';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-	title: 'ScribeGPT',
-	description: 'Generated deatiled lecture notes for self-study and review',
+	title: 'Knowledge Tree Builder',
+	description: 'Generated deatiled notes for self-study and review',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
